@@ -1,0 +1,1 @@
+timestamp(seconds),hostname,cpu,disk,network_pdata+eth0,eth1,eth2,eth3,eth4,eth5,eth6,eth7,eth8,eth9,network_pdrop,network_precv,network_psend,ram,success_sfail,success_sperc,success_ssucc,success_stime
