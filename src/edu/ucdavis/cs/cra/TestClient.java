@@ -28,6 +28,7 @@ public class TestClient {
 	private static long count = 0;
 	// The number of requests successfully received
 	private static long numReceived = 0;
+	private static long numBadReceived = 0;
 	// The total amount of time packets spent in transit (for average time calculation)
 	private static long totalTime = 0;
 	// The last number of requests received over an interval
@@ -105,6 +106,8 @@ public class TestClient {
 						if(receiveData[0] == 0) {
 							numReceived++;
 							lastNumReceived++;
+						} else {
+							numBadReceived++;
 						}
 
 					} catch (IOException e) {
@@ -145,6 +148,7 @@ public class TestClient {
 		FileWriter sfail = new FileWriter(Sys.createFile(resultsDir, file+"sfail"));
 		FileWriter sperc = new FileWriter(Sys.createFile(resultsDir, file+"sperc"));
 		FileWriter stime = new FileWriter(Sys.createFile(resultsDir, file+"stime"));
+		FileWriter sbads = new FileWriter(Sys.createFile(resultsDir, file+"sbads"));
 
 		while(!stop) {
 			// Add a new request to our request tracker, and remove entries that have timed out. (Do this in a thread-safe manner)
@@ -169,21 +173,25 @@ public class TestClient {
 				//				System.out.println(count + " " + numReceived + " " + requests.size() + " " + (count - numReceived - requests.size()) + " " + ((double)totalTime / (double)lastNumReceived));
 				long curTime = System.currentTimeMillis() - startTime;
 
-				// Number of requests received per second
+				// Number of requests received
 				ssucc.write((curTime + " " + numReceived) + "\n");
 				ssucc.flush();
 
-				// Number of requests not received per second
+				// Number of requests not received
 				sfail.write((curTime + " " + (count - numReceived - requests.size())) + "\n");
 				sfail.flush();
 
-				// Percent of requests successfully received per second
+				// Percent of requests successfully received
 				sperc.write((curTime + " " + ((double)numReceived / (double)(count - requests.size()))) + "\n");
 				sperc.flush();
 
 				// Average amount of time each request takes over the last second
 				stime.write((curTime + " " + ((double)totalTime / (double)lastNumReceived)) + "\n");
 				stime.flush();
+				
+				// Number of bad requests received
+				sbads.write((curTime + " " + numBadReceived) + "\n");
+				sbads.flush();
 
 				time = System.currentTimeMillis();
 				totalTime = 0;
